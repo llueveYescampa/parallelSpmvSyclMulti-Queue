@@ -1,0 +1,16 @@
+#!/bin/bash
+if [ "$#" -lt 2 ]
+then
+  echo "Usage: $0 programName matrixName"
+  exit 1
+fi
+
+source setIcc intel64 > /dev/null
+#export CUDA_VISIBLE_DEVICES=1
+echo "$1  ../matrices/$2.mm_bin ../matrices/$2.in_bin ../matrices/$2.out_bin "
+$1 ../matrices/$2.mm_bin ../matrices/$2.in_bin ../matrices/$2.out_bin $3
+
+#parallelSpmvMulti-Streams ../matrices/$1.mm_bin ../matrices/$1.in_bin ../matrices/$1.out_bin $2
+#cudaSparseCSR  ../matrices/$1.mm_bin ../matrices/$1.in_bin ../matrices/$1.out_bin 
+#cudaSparseHyb  ../matrices/$1.mm_bin ../matrices/$1.in_bin ../matrices/$1.out_bin 
+
