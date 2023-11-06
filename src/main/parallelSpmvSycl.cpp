@@ -307,26 +307,6 @@ int main(int argc, char *argv[])
   
   myQueue[0].wait();
 /////////////// end of  copying memory to device  //////////////////////////
-/*
-    for (int q=0; q<nQueues; ++q) {
-
-        cout << "\tblock for queue "
-             << q
-             << "  has size: ["
-             << ks[q].workGroup.get(0) 
-             << ", " 
-             << ks[q].workGroup.get(1) 
-             << "],  and its grid has size: ["
-             << ks[q].ndRange.get(0) 
-             << ", "
-             << ks[q].ndRange.get(1) 
-             << "], " 
-             << starRowQueue[q+1]-starRowQueue[q]
-             << " rows and "
-             << row_ptr[starRowQueue[q+1]-starRowQueue[q]] - row_ptr[0] 
-             << " non-zeros.\n";
-    } // end for //
-*/
 
 
 /////////////// begin  testing spmv call //////////////////////////
