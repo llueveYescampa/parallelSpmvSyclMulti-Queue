@@ -269,7 +269,7 @@ int main(int argc, char *argv[])
     } // end for //
     delete[] starRowBlock;
     delete[] blockSize;
-
+    
 /////////////// end of creating queue dependent variables //////////////////////////
 
 

@@ -5,11 +5,13 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 add_subdirectory(main)
 add_subdirectory(spmv)
+add_subdirectory(matrixPartition)
 add_subdirectory(reader)
 
 set(parallelSpmvSycl_Src 
     ${main_Src}
     ${spmv_Src}
+    ${matrixPartition_Src}
     ${reader_Src}
     PARENT_SCOPE
     )
