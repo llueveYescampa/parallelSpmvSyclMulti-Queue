@@ -46,8 +46,6 @@ int main(int argc, char *argv[])
   }; // end of meanAndSd() lambda function;
 
 
-  unsigned int n_global,nnz_global;
-
     // verifing number of input parameters //
   auto exists=true;
   auto checkSol=false;
@@ -96,15 +94,12 @@ int main(int argc, char *argv[])
     reader(n_global,nnz_global,&row_ptr,&col_idx,&val,argv[1]);
     // end of reading basic matrix data
     
-    // finding tghe global nnzPerRow and stdDev
+    // finding the global nnzPerRow and stdDev
     meanAndSd(nnzPerRow, stdDev,row_ptr, n_global);
 
     v = new floatType[n_global];    
     vectorReader(v, n_global, argv[2]);
 
-    if (checkSol) {  // put this down with the checks
-      w = new floatType[n_global];
-    } // end if //
     
 
 ////////////////// search for the raw number of block of rows   ////////////////////////////
@@ -339,67 +334,16 @@ int main(int argc, char *argv[])
 
 
 
-/////////////// begin  copying memory to device  //////////////////////////
 
-  myQueue[0].submit([w,w_d,&n_global](handler &h) {
-    // copy host_array to device_array
-    h.memcpy(w   , w_d      , n_global    * sizeof(floatType));
-  }); // end of submit() //
-  myQueue[0].wait();
-/////////////// end of copying memory to device  //////////////////////////
-
-
-
-
-
-/*    
-        
-  
-    // Timing should begin here//
-
-    struct timeval tp;                                   // timer
-    double elapsed_time;
-    gettimeofday(&tp,NULL);  // Unix timer
-    elapsed_time = -(tp.tv_sec*1.0e6 + tp.tv_usec);
-    for (int t=0; t<REP; ++t) {
-
-        //cuda_ret = cudaMemset(w_d, 0, (size_t) n_global*sizeof(floatType) );
-        //if(cuda_ret != cudaSuccess) FATAL("Unable to set device for matrix w_d");
-        
-        for (int s=0; s<nStreams; ++s) {
-            const int sRow = starRowStream[s];
-            const int nrows = starRowStream[s+1]-starRowStream[s];
-#ifdef USE_TEXTURE
-            spmv<<<grid[s], block[s], sharedMemorySize[s], stream[s] >>>((w_d+sRow), v_t, vals_d, (rows_d+sRow), (cols_d), nrows, 1.0,0.0);
-#else
-            spmv<<<grid[s], block[s], sharedMemorySize[s], stream[s] >>>((w_d+sRow), v_d,  vals_d, (rows_d+sRow), (cols_d), nrows, 1.0,0.0);
-#endif
-        } // end for //
-        
-        for (int s=0; s<nStreams; ++s) {
-            //cudaStreamSynchronize(NULL);
-            cudaStreamSynchronize(stream[s]);
-        } // end for //
-        
-    } // end for //    
-    
-    
-    gettimeofday(&tp,NULL);
-    elapsed_time += (tp.tv_sec*1.0e6 + tp.tv_usec);
-    printf ("Total time was %f seconds, GFLOPS: %f, GBytes/s: %f\n", elapsed_time*1.0e-6, 
-                                (2.0*nnz_global+ 3.0*n_global)*REP*1.0e-3/elapsed_time,
-                                (nnz_global*(2*sizeof(floatType) + sizeof(int))+n_global*(sizeof(floatType)+sizeof(int)))*REP*1.0e-3/elapsed_time );
-    
-
-    cuda_ret = cudaMemcpy(w, w_d, (n_global)*sizeof(floatType),cudaMemcpyDeviceToHost);
-    if(cuda_ret != cudaSuccess) FATAL("Unable to copy memory to device matrix y_d back to host");
-
-// cuda stuff ends here
-//////////////////////////////////////
-
-*/    
-   
     if (checkSol) {
+        w = new floatType[n_global];
+        /////////////// begin  copying memory to device  //////////////////////////
+          myQueue[0].submit([w,w_d,&n_global](handler &h) {
+            // copy host_array to device_array
+            h.memcpy(w   , w_d      , n_global    * sizeof(floatType));
+          }); // end of submit() //
+          myQueue[0].wait();
+        /////////////// end of copying memory to device  //////////////////////////    
     
         floatType *sol=nullptr;
         sol = new floatType[n_global];
@@ -420,156 +364,18 @@ int main(int argc, char *argv[])
         } while (row < n_global); // end do-while //
         
         if (row == n_global) {
-            printf("Solution match in GPU\n");
+          cout << "Solution match in GPU\n";
         } else {    
-            printf("For Matrix %s, solution does not match at element %d in GPU  %20.13e   -->  %20.13e  error -> %20.13e, tolerance: %20.13e \n", 
-            argv[1], (row+1), sol[row], w[row], error , tolerance  );
+//            printf("For Matrix %s, solution does not match at element %d in GPU  %20.13e   -->  %20.13e  error -> %20.13e, tolerance: %20.13e \n", argv[1], (row+1), sol[row], w[row], error , tolerance  );
+          cout << "For Matrix " << argv[1] << ", solution does not match at element " 
+               << (row+1) << " in GPU  " << sol[row] << "   -->  " 
+               << w[row] << "  error -> " << error 
+               << ", tolerance: " << tolerance << '\n';
+            
         } // end if //
         delete[] sol;
         
     } // end if //
-    //free(w);
-    //free(v);
-    
-//#ifdef USE_TEXTURE
-//    cudaDestroyTextureObject(v_t);
-//#endif    
-
     #include "parallelSpmvCleanData.h" 
     return 0;    
 } // end main() //
-
-
-/*
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <sys/time.h>
-*/
-
-
-/*
-void meanAndSd(floatType *mean, floatType *sd,floatType *data, int n)
-{
-    floatType sum = (floatType) 0.0; 
-    floatType standardDeviation = (floatType) 0.0;
-
-    for(int i=0; i<n; ++i) {
-        sum += data[i];
-    } // end for //
-
-    *mean = sum/n;
-
-    for(int i=0; i<n; ++i) {
-        standardDeviation += pow(data[i] - *mean, 2);
-    } // end for //
-    *sd=sqrt(standardDeviation/n);
-} // end of meanAndSd //
-*/
-
-
-/*
-    // ready to start //    
-    cudaError_t cuda_ret;
-    
-//////////////////////////////////////
-// cuda stuff start here
-
-    // Allocating device memory for input matrices 
-
-    cuda_ret = cudaMalloc((void **) &rows_d,  (n_global+1)*sizeof(int));
-    if(cuda_ret != cudaSuccess) FATAL("Unable to allocate device memory for rows_d");
-    
-    cuda_ret = cudaMalloc((void **) &cols_d,  (nnz_global)*sizeof(int));
-    if(cuda_ret != cudaSuccess) FATAL("Unable to allocate device memory for cols_d");
-    
-    cuda_ret = cudaMalloc((void **) &vals_d,  (nnz_global)*sizeof(floatType));
-    if(cuda_ret != cudaSuccess) FATAL("Unable to allocate device memory for vals_d");
-
-    cuda_ret = cudaMalloc((void **) &v_d,  (n_global)*sizeof(floatType));
-    if(cuda_ret != cudaSuccess) FATAL("Unable to allocate device memory for x_d");
-
-    cuda_ret = cudaMalloc((void **) &w_d,  (n_global)*sizeof(floatType));
-    if(cuda_ret != cudaSuccess) FATAL("Unable to allocate device memory for y_d");
-
-   // Copy the input matrices from the host memory to the device memory
-
-    cuda_ret = cudaMemcpy(rows_d, row_ptr, (n_global+1)*sizeof(int),cudaMemcpyHostToDevice);
-    if(cuda_ret != cudaSuccess) FATAL("Unable to copy memory to device matrix rows_d");
-
-    cuda_ret = cudaMemcpy(cols_d, col_idx, (nnz_global)*sizeof(int),cudaMemcpyHostToDevice);
-    if(cuda_ret != cudaSuccess) FATAL("Unable to copy memory to device matrix cols_d");
-
-    cuda_ret = cudaMemcpy(vals_d, val, (nnz_global)*sizeof(floatType),cudaMemcpyHostToDevice);
-    if(cuda_ret != cudaSuccess) FATAL("Unable to copy memory to device matrix vals_d");
-
-
-    cuda_ret = cudaMemcpy(v_d, v, (n_global)*sizeof(floatType),cudaMemcpyHostToDevice);
-    if(cuda_ret != cudaSuccess) FATAL("Unable to copy memory to device matrix x_d");
-
-#ifdef USE_TEXTURE
-
-    cudaTextureDesc td;
-    memset(&td, 0, sizeof(td));
-    td.normalizedCoords = 0;
-    td.addressMode[0] = cudaAddressModeClamp;
-    td.readMode = cudaReadModeElementType;
-
-
-    cudaResourceDesc resDesc;
-    memset(&resDesc, 0, sizeof(resDesc));
-    resDesc.resType = cudaResourceTypeLinear;
-    resDesc.res.linear.devPtr = v_d;
-    resDesc.res.linear.sizeInBytes = n_global*sizeof(floatType);
-    #ifdef DOUBLE
-    resDesc.res.linear.desc.f = cudaChannelFormatKindUnsigned;
-    resDesc.res.linear.desc.y = 32;
-    #else
-    resDesc.res.linear.desc.f = cudaChannelFormatKindFloat;
-    #endif
-    resDesc.res.linear.desc.x = 32;
-
-    cudaTextureObject_t v_t;
-    cuda_ret = cudaCreateTextureObject(&v_t, &resDesc, &td, NULL);
-    if(cuda_ret != cudaSuccess) FATAL("Unable to create text memory v_t");
-    
-
-    //cuda_ret = cudaBindTexture(NULL, v_t, v_d, n_global*sizeof(floatType));
-    //cuda_ret = cudaBindTexture(NULL, valTex, vals_d, nnz_global*sizeof(floatType));            
-  
-  
-#endif
-    //cudaDeviceSetCacheConfig(cudaFuncCachePreferL1);
-
-
-
-////////////////// search for the  number of block of rows  ///////////////////////
-    { // determining the number of block rows based on mean and sd of the nnz 
-        // opening matrix file to read mean and sd of number of nonzeros per row
-        double tmpMean, tmpSD;
-        fh = fopen(argv[1], "rb");
-        // reading laast two values in file: mean and sd //
-        fseek(fh, 0L, SEEK_END);
-        long int offset = ftell(fh)-2*sizeof(double);
-        fseek(fh, offset, SEEK_SET);
-        if ( !fread(&tmpMean, sizeof(double), (size_t) 1, fh)) exit(0);
-        if ( !fread(&tmpSD, sizeof(double), (size_t) 1, fh)) exit(0);
-        if (fh) fclose(fh);
-        
-        // determining number of streams based on mean and sd
-        floatType ratio = tmpSD/tmpMean;
-        //printf("file: %s, line: %d, tMean nnz: %.2f, SD nnz: %.2f, ratio: %.2f\n", __FILE__, __LINE__ , tmpMean, tmpSD, ratio);
-        nRowBlocks = round(12.161 * log(ratio) + 14.822);
-        if (nRowBlocks < 1 ) nRowBlocks=1;               
-        printf("nRowBlocks: %d\n", nRowBlocks);
-    } // end of determining the number of block rows based on mean and sd of the nnz
-    
-     
-    // the value of  nRowBlocks can be forced by run-time paramenter   
-    if (argc  > 4  && atoi(argv[4]) > 0) {
-        nRowBlocks = atoi(argv[4]);
-    } // end if //
-    if (nRowBlocks > n_global) nRowBlocks = n_global;
-////////////////// end of search for the  number of block of rows  /////////////////////////
-*/
-

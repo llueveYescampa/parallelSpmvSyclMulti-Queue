@@ -1,29 +1,19 @@
-    delete[] w;
+    delete[] w;    
+/////////////// begin  de-allocating device memory //////////////////////////    
+    free(w_d, myQueue[0]);
+    free(v_d, myQueue[0]);
+    free(vals_d, myQueue[0]);
+    free(cols_d, myQueue[0]);
+    free(rows_d, myQueue[0]);    
+/////////////// end  de-allocating device memory //////////////////////////
+    delete[] starRowQueue;
+    
+    delete[] ks;
+    delete[] myQueue;
+
+
     delete[] v;
     delete[] val;
     delete[] col_idx;
     delete[] row_ptr;
-    delete[] myQueue;
-    delete[] starRowQueue;
 
-/*
-    free(starRowStream);
-
-    cudaFree(rows_d);
-    cudaFree(cols_d);
-    cudaFree(vals_d);
-    cudaFree(v_d);
-    cudaFree(w_d);
-
-    for (int s=0; s<nStreams; ++s) {
-        cudaStreamDestroy(stream[s]);
-    } // end for /
-    
-    free(stream);
-    
-    //free(meanNnzPerRow);
-    //free(sd);
-    free(sharedMemorySize);
-    free(block);
-    free(grid);
-*/

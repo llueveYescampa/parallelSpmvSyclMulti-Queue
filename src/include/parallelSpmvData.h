@@ -1,6 +1,6 @@
-//# define DEFAULT_STREAMS 4
-//# define MAX_STREAMS 16
+    // begining of data for solution
 
+    unsigned int n_global,nnz_global;
     unsigned int *row_ptr = nullptr;
     unsigned int *col_idx = nullptr;
     floatType *val = nullptr;
@@ -23,28 +23,4 @@
     floatType *v_d = nullptr;
     floatType *w_d = nullptr;
 
- 
-/*
-    floatType meanNnzPerRow=static_cast<floatType>(0);
-
-
-
-
-    // data for the on_proc solution
-
-    int *rows_d, *cols_d;
-    floatType *vals_d;
-    floatType *v_d, *w_d;
-
-    // end of data for the on_proc solution
-    
-    
-    
-    
-    floatType sd=0;
-    
-    dim3 *block=NULL;
-    dim3 *grid=NULL;
-
-    size_t *sharedMemorySize=NULL;
-*/
+    // end of data for solution
