@@ -23,8 +23,8 @@ void spmv(       floatType *__restrict__       y,
            const unsigned int  *__restrict__ const row_ptr, 
            const unsigned int  *__restrict__ const col_idx, 
            const unsigned int nRows,
-           const floatType &alpha,
-           const floatType &beta,
+           const floatType alpha,
+           const floatType beta,
                  queue &q,
            const kernelDomain &kd           
           )
