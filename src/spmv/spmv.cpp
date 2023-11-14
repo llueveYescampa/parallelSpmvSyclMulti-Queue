@@ -17,7 +17,7 @@ void subgroupReduce(volatile floatType *__restrict__  const temp1) {
     if (bs >=  2) temp1[0] += temp1[ 1];
 } // end of subgroupReduce() //
 
-void spmv(       floatType *__restrict__       y, 
+void spmv(       floatType *__restrict__ const y, 
            const floatType *__restrict__ const x, 
            const floatType *__restrict__ const val, 
            const unsigned int  *__restrict__ const row_ptr, 

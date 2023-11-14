@@ -32,7 +32,7 @@
 
     
               
-    void spmv(       floatType *__restrict__       y, 
+    void spmv(       floatType *__restrict__ const y, 
                const floatType *__restrict__ const x, 
                const floatType *__restrict__ const val, 
                const unsigned int  *__restrict__ const row_ptr, 
