@@ -1,9 +1,9 @@
 #define LOW(n,p)  ((n)/(p))
 
-void getRowsNnzPerQueue(      unsigned int *__restrict__ const rowsPerSet, 
+void getRowsNnzPerQueue(      unsigned int *__restrict const rowsPerSet, 
                         const unsigned int &global_n, 
                         const unsigned int &global_nnz,  
-                        const unsigned int *__restrict__ const rows, 
+                        const unsigned int *__restrict const rows, 
                         const unsigned int &nRowBlocks)
 {
   unsigned int lowRow=0, upRow;

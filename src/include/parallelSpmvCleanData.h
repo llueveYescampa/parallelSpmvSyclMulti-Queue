@@ -6,6 +6,7 @@
     free(cols_d, myQueue[0]);
     free(rows_d, myQueue[0]);    
 /////////////// end  de-allocating device memory //////////////////////////
+    delete[] toSortQueue;
     delete[] starRowQueue;
     
     delete[] ks;

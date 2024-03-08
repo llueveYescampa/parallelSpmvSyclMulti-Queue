@@ -23,4 +23,7 @@
     floatType *v_d = nullptr;
     floatType *w_d = nullptr;
 
+    struct str *toSortQueue=nullptr;
+    bool sort = false;
+    bool ascen = false;
     // end of data for solution

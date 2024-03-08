@@ -14,6 +14,7 @@ MESSAGE( STATUS "CMAKE_CXX_COMPILER_ID: "         ${CMAKE_CXX_COMPILER_ID} )
 
 if ( CMAKE_CXX_COMPILER_ID STREQUAL "IntelLLVM" )
     set(CMAKE_CXX_FLAGS  "${CMAKE_C_FLAGS} -fsycl -Wall -fvectorize  -qopt-report-file=stderr -qopt-report=max  -xCORE-AVX2")
+    #set(CMAKE_CXX_FLAGS  "${CMAKE_C_FLAGS} -fsycl -fsycl-targets=nvptx64-nvidia-cuda -Wall -fvectorize  -qopt-report-file=stderr -qopt-report=max  -xCORE-AVX2")
     #set(CMAKE_CXX_FLAGS  "${CMAKE_C_FLAGS} -Wall -qopt-report=5 -qopt-report-phase=vec -xCORE-AVX2")
     #set(CMAKE_CXX_FLAGS  "${CMAKE_C_FLAGS} -Wall -qopt-report=5 -qopt-report-phase=vec ")
 endif ( )

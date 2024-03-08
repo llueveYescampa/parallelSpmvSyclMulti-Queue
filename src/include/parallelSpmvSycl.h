@@ -2,13 +2,14 @@
 #define PARALLELSPMV_H
 #include "floatType.h"
 
-  #include <sycl/sycl.hpp>
-  using namespace sycl;
-  typedef struct kernelDomain {
-    range<2> ndRange{1,1};
-    range<2> workGroup{1,1};
-    //nd_range<2> myKernel{ndRange, workGroup};
-  } kernelDomain;
+    #include <sycl/sycl.hpp>
+    using namespace sycl;
+    typedef struct kernelDomain {
+      range<2> ndRange{1,1};
+      range<2> workGroup{1,1};
+      //nd_range<2> myKernel{ndRange, workGroup};
+    } kernelDomain;
+
 
 
     void reader(unsigned int &gn, 
@@ -22,25 +23,25 @@
     void vectorReader(floatType *const v, unsigned int &n, const char *const vectorFile);
 
 
-    void getRowsNnzPerQueue(      unsigned int *__restrict__ const rowsPerSet, 
+    void getRowsNnzPerQueue(      unsigned int *__restrict const rowsPerSet, 
                             const unsigned int &global_n, 
                             const unsigned int &global_nnz,  
-                            const unsigned int *__restrict__ const rows, 
+                            const unsigned int *__restrict const rows, 
                             const unsigned int &nRowBlocks);
         
 
 
     
               
-    void spmv(       floatType *__restrict__ const y, 
-               const floatType *__restrict__ const x, 
-               const floatType *__restrict__ const val, 
-               const unsigned int  *__restrict__ const row_ptr, 
-               const unsigned int  *__restrict__ const col_idx, 
-               const unsigned int nRows,
-               const floatType &alpha,
-               const floatType &beta,
-                     queue &q,
-               const kernelDomain &kd
+    void spmv(       floatType     *__restrict const y, 
+               const floatType     *__restrict const x, 
+               const floatType     *__restrict const val, 
+               const unsigned int  *__restrict const row_ptr, 
+               const unsigned int  *__restrict const col_idx, 
+               const unsigned int                      &nRows,
+               const floatType                         &alpha,
+               const floatType                         &beta,
+                     queue                             &q,
+               const kernelDomain                      &kd
               );
 #endif
