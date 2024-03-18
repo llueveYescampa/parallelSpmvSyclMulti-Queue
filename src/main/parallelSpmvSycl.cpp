@@ -231,6 +231,10 @@ int main(int argc, char *argv[])
 
   //auto *q = new queue{property::queue::in_order()};
   myQueue = new queue[nQueues];
+  for (auto q=0; q<nQueues; ++q )  myQueue[q] = queue{property::queue::in_order()};
+
+
+    
   ks  = new kernelDomain [nQueues];
 /*
   /// listing device features //////
